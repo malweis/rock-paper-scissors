@@ -1,3 +1,10 @@
+const buttons = document.querySelectorAll('button');
+const resultsDiv = document.getElementById('results');
+const scoreDiv = document.getElementById('score');
+
+let playerScore = 0;
+let computerScore = 0;
+
 let getComputerChoice = () => {
   let rand = Math.floor(Math.random() * 3) + 1;
 
@@ -25,7 +32,7 @@ let rockPaperScissors = (playerSelection, computerSelection) => {
     return "Empate!";
   } else if (
     (playerSelection === "piedra" && computerSelection === "tijeras") ||
-    (playerSelection === "tijera" && computerSelection === "papel") ||
+    (playerSelection === "tijeras" && computerSelection === "papel") ||
     (playerSelection === "papel" && computerSelection === "piedra")
   ) {
     return "Ganaste. " + playerSelection + " vence a " + computerSelection;
@@ -34,31 +41,40 @@ let rockPaperScissors = (playerSelection, computerSelection) => {
   }
 };
 
-let game = () => {
-  let player = 0;
-  let computer = 0;
+const playRound = (playerSelection) => {
+  const computerSelection = getComputerChoice();
+  const roundResult = rockPaperScissors(playerSelection, computerSelection);
 
-  for (let i = 1; i <= 5; i++) {
-    let playerChoice = prompt("Input your choice");
-    let computerChoice = getComputerChoice();
-    let round = rockPaperScissors(playerChoice, computerChoice);
-    console.log(round);
-    if (round.includes("Ganaste")) {
-      player++;
-    } else if (round.includes("Perdiste")) {
-      computer++;
-    } else {
-      break;
-    }
+  // Update the resultsDiv with the round result
+  resultsDiv.textContent = roundResult;
+
+  // Update the score
+  if (roundResult.includes("Ganaste")) {
+    playerScore++;
+  } else if (roundResult.includes("Perdiste")) {
+    computerScore++;
   }
 
-  if (player > computer) {
-    return "Gana el jugador";
-  } else if (computer > player) {
-    return "Gana la computadora";
-  } else {
-    return "Empate";
+  // Update the scoreDiv with the current score
+  scoreDiv.textContent = `Player: ${playerScore} - Computer: ${computerScore}`;
+
+  // Check if any player reached 5 points
+  if (playerScore === 5 || computerScore === 5) {
+    // Announce the winner
+    const winner = playerScore === 5 ? 'Player' : 'Computer';
+    resultsDiv.textContent += ` ${winner} wins the game!`;
+
+    // Disable the buttons to prevent further gameplay
+    buttons.forEach(button => {
+      button.disabled = true;
+    });
   }
 };
 
-console.log(game());
+// Event listeners for each button
+buttons.forEach(button => {
+  button.addEventListener('click', (event) => {
+    const playerSelection = event.target.textContent;
+    playRound(playerSelection);
+  });
+});
